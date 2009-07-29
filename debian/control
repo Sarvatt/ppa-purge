@@ -4,6 +4,7 @@ Priority: extra
 Maintainer: Robert Hooker (Sarvatt) <sarvatt@gmail.com>
 Build-Depends: debhelper (>= 7)
 Standards-Version: 3.8.1
+Vcs-Bzr: https://code.launchpad.net/~xorg-edgers/ppa-purge/ubuntu
 
 Package: ppa-purge
 Architecture: any
