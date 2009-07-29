@@ -35,25 +35,24 @@ warn() {
 }
 
 usage() {
-	echo "Usage: sudo ppa-purge [options]"
+	echo "Usage: sudo ppa-purge <ppa-name> [options]"
 	echo
 	echo "This script will reset all packages from a PPA of your choice to the standard ones"
 	echo "released for your distribution. It must be run with superuser privileges."
 	echo
 	echo "Example usage commands:"
-	echo "	sudo ppa-purge -n xorg-edgers"
+	echo "	sudo ppa-purge xorg-edgers"
 	echo "		Will remove https://launchpad.net/~xorg-edgers/+archive/ppa"
 	echo
-	echo "	sudo ppa-purge -n sarvatt -p xorg-testing"
+	echo "	sudo ppa-purge sarvatt -p xorg-testing"
 	echo "		Will remove https://launchpad.net/~sarvatt/+archive/xorg-testing"
 	echo
-	echo "	sudo ppa-purge -n sarvatt -p xorg-testing -v -t /opt"
+	echo "	sudo ppa-purge sarvatt -p xorg-testing -v -t /opt"
 	echo "		Will remove https://launchpad.net/~sarvatt/+archive/xorg-testing, store log"
 	echo "		log files in /opt/ and produce verbose messages"
 	echo
 	echo "Options:"
 	echo "	-v		Enable verbose messages.				default: off"
-	echo "	-n [name]	Name of the PPA owner **required**			example: xorg-edgers"
 	echo "	-p [ppa]  	Name of the PPA to be reset (lowercase)	 	    	default: ppa"
 	echo "	-t [directory]	Directory to store logs	(no trailing slash)		default: /tmp"
 	exit $1
@@ -62,7 +61,6 @@ usage() {
 # Command line options
 while getopts "n:p:t:v:h\?" opt; do
 	case "$opt" in
-		n ) PPAOWNER="$OPTARG"				;;
 		p ) PPANAME="$OPTARG"				;;
 		t ) TEMPDIR="$OPTARG"				;;
 		v ) VERB=$(($VERB + 1))				;;
@@ -73,12 +71,10 @@ while getopts "n:p:t:v:h\?" opt; do
 done
 shift $(($OPTIND -1))
 
-if [ -z "$PPAOWNER" ]; then
-	warn "-n parameter is required."
-	usage 1
-fi
+PPAOWNER=$1 && shift
 
-if [ -z $1 ]; then
+if [ -z "$PPAOWNER" ]; then
+	warn "Required ppa-name argument was not specified"
 	usage 1
 fi
 
