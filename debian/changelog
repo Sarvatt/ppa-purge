@@ -1,0 +1,13 @@
+ppa-purge (0.2) karmic; urgency=low
+
+  * Don't remove ppa-purge if the package exists in the PPA list.
+  * Add error message if PPA = xorg-edgers with a notice that libdrm-radeon1
+    has to be manually removed afterwards.
+
+ -- Robert Hooker (Sarvatt) <sarvatt@gmail.com>  Wed, 29 Jul 2009 08:51:35 -0400
+
+ppa-purge (0.1) karmic; urgency=low
+
+  * Initial Release.
+
+ -- Robert Hooker (Sarvatt) <sarvatt@gmail.com>  Wed, 29 Jul 2009 04:01:34 -0400

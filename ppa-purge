@@ -1,0 +1,167 @@
+#!/bin/bash
+# A script to remove all packages in a PPA and revert back to the normal
+# distribution ones.
+#
+# Robert Hooker (Sarvatt) 
+# History:
+# v0.1 - 07-28-2009: Initial Revision.
+# v0.2 - 07-29-2009: Add warnings, don't remove this package if it exists in the PPA.
+#
+# Questions? contact sarvatt@gmail.com
+
+# Defaults
+DIST=${DIST:-$(lsb_release -c -s)}
+ARCH=$(dpkg-architecture -qDEB_HOST_ARCH)
+SOURCES=${SOURCES:-/etc/apt/sources.list}
+PPAOWNER=${PPAOWNER:-}
+PPANAME=${PPANAME:-ppa}
+TEMPDIR=${TEMPDIR:-/tmp}
+APTLINE=""
+PACKAGELIST=""
+VERB=${VERB:-0}
+i=1
+
+# Functions to write output nicely.
+write_msg() {
+    echo "$*" | fold -s -w "${COLUMNS:-80}"
+}
+
+msg() {
+	write_msg "$*"
+}
+
+warn() {
+	write_msg "Warning:  $*" 1>&2
+}
+
+usage() {
+	echo "Usage: sudo ppa-purge [options]"
+	echo
+	echo "This script will reset all packages from a PPA of your choice to the standard ones"
+	echo "released for your distribution. It must be run with superuser privileges."
+	echo
+	echo "Example usage commands:"
+	echo "	sudo ppa-purge -n xorg-edgers"
+	echo "		Will remove https://launchpad.net/~xorg-edgers/+archive/ppa"
+	echo
+	echo "	sudo ppa-purge -n sarvatt -p xorg-testing"
+	echo "		Will remove https://launchpad.net/~sarvatt/+archive/xorg-testing"
+	echo
+	echo "	sudo ppa-purge -n sarvatt -p xorg-testing -v -t /opt"
+	echo "		Will remove https://launchpad.net/~sarvatt/+archive/xorg-testing, store log"
+	echo "		log files in /opt/ and produce verbose messages"
+	echo
+	echo "Options:"
+	echo "	-v		Enable verbose messages.				default: off"
+	echo "	-n [name]	Name of the PPA owner **required**			example: xorg-edgers"
+	echo "	-p [ppa]  	Name of the PPA to be reset (lowercase)	 	    	default: ppa"
+	echo "	-t [directory]	Directory to store logs	(no trailing slash)		default: /tmp"
+	exit $1
+}
+
+# Command line options
+while getopts "n:p:t:v:h\?" opt; do
+	case "$opt" in
+		n ) PPAOWNER="$OPTARG"				;;
+		p ) PPANAME="$OPTARG"				;;
+		t ) TEMPDIR="$OPTARG"				;;
+		v ) VERB=$(($VERB + 1))				;;
+		h ) usage 0;					;;
+		\?) usage 1;					;;
+		* ) warn "Unknown option '$opt'"; usage 1;	;;
+	esac
+done
+shift $(($OPTIND -1))
+
+if [ -z "$PPAOWNER" ]; then
+	warn "-n parameter is required."
+	usage 1
+fi
+
+if [ -z $1 ]; then
+	usage 1
+fi
+
+if [ "$(id -u)" != "0" ]; then
+	warn "This script must be run with superuser privileges."
+	usage 1
+fi
+
+if [ $VERB -eq 1 ]; then
+	echo
+	msg "Architecture:						$ARCH"
+	msg "Distribution:						$DIST"
+fi
+msg "Temporary log directory:				${TEMPDIR}"
+msg "PPA to be removed: 					$PPAOWNER $PPANAME";echo;echo
+
+# Initialize PPALIST after command line options are read.
+PPALIST=${TEMPDIR}/${PPAOWNER}-${PPANAME}.log
+
+# Initialize temporary logs.
+if [ $PPANAME == "ppa" ]; then
+	cat /var/lib/apt/lists/ppa.launchpad.net_${PPAOWNER}_ppa_ubuntu_dists_${DIST}_main_binary-${ARCH}_Packages | \
+	grep "Package: " | cut -d " " -f2 | sort -n - > ${PPALIST};
+else
+	cat /var/lib/apt/lists/ppa.launchpad.net_${PPAOWNER}_${PPANAME}_ubuntu_dists_${DIST}_main_binary-${ARCH}_Packages | \
+	grep "Package: " | cut -d " " -f2 | sort -n - > ${PPALIST};
+fi
+
+echo;msg "File $PPALIST containing a list of all packages in the ${PPAOWNER}-${PPANAME} PPA created."
+
+# Don't remove ppa-purge (this package) if it exists in the PPA package list.
+if [ -n `grep "ppa-purge" ${PPALIST}` ]; then
+        sed -i '/ppa-purge/d' ${PPALIST}
+fi
+
+
+dpkg -l | cut -d' ' -f3 | sort -n - | comm -12 - $PPALIST >${TEMPDIR}/packages-to-remove.log
+echo;msg "File ${TEMPDIR}/packages-to-remove.log created."
+
+# Store number of packages in the PPA list for later use
+x=`wc -l ${TEMPDIR}/packages-to-remove.log | cut -d" " -f1`
+
+# Create apt-get invocation args from package lists in the logs.
+while [ $i -le $x ]
+do
+	APTLINE=${APTLINE}" `head -$i ${TEMPDIR}/packages-to-remove.log | tail -1`/"$DIST
+	i=`expr $i + 1`
+done
+
+if [ $VERB -eq 1 ]; then
+	echo;msg "Number of packages installed from the $PPANAME PPA:		${x}"
+	echo;msg "Package removal list generated."
+	echo;msg "Packages:  $APTLINE";echo
+fi
+
+# Check if the PPA is in /etc/apt/sources.list, or a seperate file in
+# /etc/apt/sources.list.d/ and store SOURCES accordingly.
+
+if [ -z "$(grep $PPAOWNER /etc/apt/sources.list)" ]
+then
+	SOURCES=$(grep -R -l "$PPANAME" /etc/apt/sources.list.d/)
+	echo;msg "$PPAOWNER apt sources found at non-standard location $SOURCES"
+else
+	echo;msg "$PPAOWNER apt sources found in standard location (/etc/apt/sources.list)"
+fi
+
+echo;echo -n "Press enter to complete the purge..."
+read nothing
+
+sed -i "/ ${PPAOWNER}\/${PPANAME}/s/^# deb/deb/;/${PPAOWNER}\/${PPANAME}/s/^deb/# deb/" ${SOURCES}
+echo;msg "$PPAOWNER PPA removed from sources."
+
+apt-get update >/dev/null
+
+# FIXME:
+# Workaround for now incase apt-get fails because of a package not in ubuntu. Aptitude actually works
+# but it would be preferred to remove the package from $APTLINE directly.
+
+apt-get install ${APTLINE} || echo;msg "Package not included in ubuntu detected, falling back to aptitude to work around it.";echo;aptitude install ${APTLINE};echo || warn "Something went wrong. Giving up.";exit 1
+if [ $PPAOWNER == "xorg-edgers" ]; then
+	echo;msg "I noticed that the PPA you are reverting is xorg-edgers. Unfortunately you will have to manually remove libdrm-radeon1 after running this script to fully clean it."
+fi
+
+echo;msg "PPA Purged!"
+
+exit 0
