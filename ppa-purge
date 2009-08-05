@@ -4,8 +4,9 @@
 #
 # Robert Hooker (Sarvatt) 
 # History:
-# v0.1 - 07-28-2009: Initial Revision.
-# v0.2 - 07-29-2009: Add warnings, don't remove this package if it exists in the PPA.
+# v0.1   - 07-28-2009: Initial Revision.
+# v0.2   - 07-29-2009: Add warnings, don't remove this package if it exists in the PPA.
+# v0.2.2 - 08-05-2009: Fix command option parsing errors.
 #
 # Questions? contact sarvatt@gmail.com
 
@@ -58,8 +59,10 @@ usage() {
 	exit $1
 }
 
+PPAOWNER=$1 && shift
+
 # Command line options
-while getopts "n:p:t:v:h\?" opt; do
+while getopts "p:t:vh\?" opt; do
 	case "$opt" in
 		p ) PPANAME="$OPTARG"				;;
 		t ) TEMPDIR="$OPTARG"				;;
@@ -70,8 +73,6 @@ while getopts "n:p:t:v:h\?" opt; do
 	esac
 done
 shift $(($OPTIND -1))
-
-PPAOWNER=$1 && shift
 
 if [ -z "$PPAOWNER" ]; then
 	warn "Required ppa-name argument was not specified"
@@ -135,7 +136,7 @@ fi
 
 if [ -z "$(grep $PPAOWNER /etc/apt/sources.list)" ]
 then
-	SOURCES=$(grep -R -l "$PPANAME" /etc/apt/sources.list.d/)
+	SOURCES=$(grep -R -l "${PPAOWNER}/${PPANAME}" /etc/apt/sources.list.d/)
 	echo;msg "$PPAOWNER apt sources found at non-standard location $SOURCES"
 else
 	echo;msg "$PPAOWNER apt sources found in standard location (/etc/apt/sources.list)"
