@@ -141,16 +141,13 @@ read nothing
 sed -i "/ ${PPAOWNER}\/${PPANAME}/s/^# deb/deb/;/${PPAOWNER}\/${PPANAME}/s/^deb/# deb/" ${SOURCES}
 echo;msg "$PPAOWNER PPA removed from sources."
 
-apt-get update >/dev/null
+apt-get update >/dev/null || warn "Apt-get update failed for some reason. Giving up."
 
 # FIXME:
 # Workaround for now incase apt-get fails because of a package not in ubuntu. Aptitude actually works
 # but it would be preferred to remove the package from $APTLINE directly.
 
-apt-get install ${APTLINE} || echo;msg "Package not included in ubuntu detected, falling back to aptitude to work around it.";echo;aptitude install ${APTLINE};echo || warn "Something went wrong. Giving up.";exit 1
-if [ $PPAOWNER == "xorg-edgers" ]; then
-	echo;msg "I noticed that the PPA you are reverting is xorg-edgers. Unfortunately you will have to manually remove libdrm-radeon1 after running this script to fully clean it."
-fi
+apt-get install ${APTLINE} || echo;msg "Package not included in ubuntu detected, falling back to aptitude to work around it.";echo;aptitude install ${APTLINE} || warn "Something went wrong. Giving up.";exit 1
 
 echo;msg "PPA Purged!"
 
