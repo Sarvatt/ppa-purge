@@ -1,4 +1,4 @@
-\ppa-purge (0.2.3) karmic; urgency=low
+ppa-purge (0.2.3) karmic; urgency=low
 
   * Remove -v option, make the script always verbose.
   * Minor fixups and warnings added.
