@@ -19,7 +19,6 @@ PPANAME=${PPANAME:-ppa}
 TEMPDIR=${TEMPDIR:-/tmp}
 APTLINE=""
 PACKAGELIST=""
-VERB=${VERB:-0}
 i=1
 
 # Functions to write output nicely.
@@ -48,12 +47,11 @@ usage() {
 	echo "	sudo ppa-purge sarvatt -p xorg-testing"
 	echo "		Will remove https://launchpad.net/~sarvatt/+archive/xorg-testing"
 	echo
-	echo "	sudo ppa-purge sarvatt -p xorg-testing -v -t /opt"
+	echo "	sudo ppa-purge sarvatt -p xorg-testing -t /opt"
 	echo "		Will remove https://launchpad.net/~sarvatt/+archive/xorg-testing, store log"
-	echo "		log files in /opt/ and produce verbose messages"
+	echo "		log files in /opt/"
 	echo
 	echo "Options:"
-	echo "	-v		Enable verbose messages.				default: off"
 	echo "	-p [ppa]  	Name of the PPA to be reset (lowercase)	 	    	default: ppa"
 	echo "	-t [directory]	Directory to store logs	(no trailing slash)		default: /tmp"
 	exit $1
@@ -62,11 +60,10 @@ usage() {
 PPAOWNER=$1 && shift
 
 # Command line options
-while getopts "p:t:vh\?" opt; do
+while getopts "p:t:h\?" opt; do
 	case "$opt" in
 		p ) PPANAME="$OPTARG"				;;
 		t ) TEMPDIR="$OPTARG"				;;
-		v ) VERB=$(($VERB + 1))				;;
 		h ) usage 0;					;;
 		\?) usage 1;					;;
 		* ) warn "Unknown option '$opt'"; usage 1;	;;
@@ -84,11 +81,8 @@ if [ "$(id -u)" != "0" ]; then
 	usage 1
 fi
 
-if [ $VERB -eq 1 ]; then
-	echo
-	msg "Architecture:						$ARCH"
-	msg "Distribution:						$DIST"
-fi
+echo;msg "Architecture:						$ARCH"
+msg "Distribution:						$DIST"
 msg "Temporary log directory:				${TEMPDIR}"
 msg "PPA to be removed: 					$PPAOWNER $PPANAME";echo;echo
 
@@ -109,6 +103,7 @@ echo;msg "File $PPALIST containing a list of all packages in the ${PPAOWNER}-${P
 # Don't remove ppa-purge (this package) if it exists in the PPA package list.
 if [ -n `grep "ppa-purge" ${PPALIST}` ]; then
         sed -i '/ppa-purge/d' ${PPALIST}
+	msg "ppa-purge detected in the PPA, not removing."
 fi
 
 
@@ -125,11 +120,9 @@ do
 	i=`expr $i + 1`
 done
 
-if [ $VERB -eq 1 ]; then
-	echo;msg "Number of packages installed from the $PPANAME PPA:		${x}"
-	echo;msg "Package removal list generated."
-	echo;msg "Packages:  $APTLINE";echo
-fi
+echo;msg "Number of packages installed from the $PPANAME PPA:		${x}"
+echo;msg "Package removal list generated."
+echo;msg "Packages:  $APTLINE";echo
 
 # Check if the PPA is in /etc/apt/sources.list, or a seperate file in
 # /etc/apt/sources.list.d/ and store SOURCES accordingly.
