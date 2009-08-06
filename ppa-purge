@@ -7,6 +7,7 @@
 # v0.1   - 07-28-2009: Initial Revision.
 # v0.2   - 07-29-2009: Add warnings, don't remove this package if it exists in the PPA.
 # v0.2.2 - 08-05-2009: Fix command option parsing errors.
+# v0.2.3 - 08-06-2009: Removed -v option, script will always be verbose. Also minor fixups.
 #
 # Questions? contact sarvatt@gmail.com
 
