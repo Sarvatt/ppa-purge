@@ -8,7 +8,7 @@ Vcs-Bzr: https://code.launchpad.net/~xorg-edgers/ppa-purge/ubuntu
 
 Package: ppa-purge
 Architecture: any
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, dpkg-dev
 Description: Bash shell script for PPA management.
  This package provides a bash shell script capable of automatically downgrading all
  packages in a given PPA back to the ubuntu versions.
