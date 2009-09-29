@@ -1,3 +1,11 @@
+ppa-purge (0.2.5) UNRELEASED; urgency=low
+
+  * use dpkg --print-architecture and drop depends on dpkg-dev
+  * debian/control: Architecture: all
+  * debian/control: update to Standards 3.8.3 (no changes needed)
+
+ -- Tormod Volden <debian.tormod@gmail.com>  Wed, 30 Sep 2009 00:58:31 +0200
+
 ppa-purge (0.2.4) karmic; urgency=low
 
   * Add dpkg-dev to depends for dpkg-architecture.
