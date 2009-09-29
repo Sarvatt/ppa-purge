@@ -13,7 +13,7 @@
 
 # Defaults
 DIST=${DIST:-$(lsb_release -c -s)}
-ARCH=$(dpkg-architecture -qDEB_HOST_ARCH)
+ARCH=$(dpkg --print-architecture)
 SOURCES=${SOURCES:-/etc/apt/sources.list}
 PPAOWNER=${PPAOWNER:-}
 PPANAME=${PPANAME:-ppa}
