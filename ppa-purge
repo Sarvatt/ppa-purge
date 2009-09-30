@@ -127,9 +127,6 @@ else
 	echo;msg "$PPAOWNER apt sources found in standard location (/etc/apt/sources.list)"
 fi
 
-echo;echo -n "Press enter to complete the purge..."
-read nothing
-
 sed -i "\:^[^#]+/${PPAOWNER}/${PPANAME}/:s/^deb/# deb/" ${SOURCES}
 echo;msg "$PPAOWNER PPA removed from sources."
 
