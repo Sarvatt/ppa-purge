@@ -20,7 +20,7 @@ PPANAME=${PPANAME:-ppa}
 PPA_PKGS=$(mktemp)
 REVERTS=$(mktemp)
 trap "rm $PPA_PKGS $REVERTS" 0
-APTLINE=""
+REINSTALL=""
 PACKAGELIST=""
 i=1
 
@@ -108,13 +108,13 @@ x=`wc -l $REVERTS | cut -d" " -f1`
 # Create apt-get invocation args from package lists in the logs.
 while [ $i -le $x ]
 do
-	APTLINE=${APTLINE}" `head -$i $REVERTS | tail -1`/"$DIST
+	REINSTALL=${REINSTALL}" `head -$i $REVERTS | tail -1`/"$DIST
 	i=`expr $i + 1`
 done
 
 echo;msg "Number of packages installed from the $PPANAME PPA:		${x}"
 echo;msg "Package removal list generated."
-echo;msg "Packages:  $APTLINE";echo
+echo;msg "Packages:  $REINSTALL";echo
 
 # Check if the PPA is in /etc/apt/sources.list, or a seperate file in
 # /etc/apt/sources.list.d/ and store SOURCES accordingly.
@@ -137,11 +137,11 @@ apt-get update >/dev/null || warn "Apt-get update failed for some reason. Giving
 
 # FIXME:
 # Workaround for now incase apt-get fails because of a package not in ubuntu. Aptitude actually works
-# but it would be preferred to remove the package from $APTLINE directly.
+# but it would be preferred to remove the package from $REINSTALL directly.
 
-if apt-get install ${APTLINE} ; then
+if apt-get install ${REINSTALL} ; then
 	echo;msg "PPA Purged!"
-elif aptitude install ${APTLINE} ; then
+elif aptitude install ${REINSTALL} ; then
 	echo;msg "Package not included in Ubuntu detected, falling back to aptitude to work around it.";echo
 else
 	warn "Something went wrong. Giving up.";exit 1
