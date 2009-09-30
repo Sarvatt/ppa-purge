@@ -2,19 +2,23 @@
 # A script to remove all packages in a PPA and revert back to the normal
 # distribution ones.
 #
-# Robert Hooker (Sarvatt) 
-# History:
-# v0.1   - 07-28-2009: Initial Revision.
-# v0.2   - 07-29-2009: Add warnings, don't remove this package if it exists in the PPA.
-# v0.2.2 - 08-05-2009: Fix command option parsing errors.
-# v0.2.3 - 08-06-2009: Removed -v option, script will always be verbose. Also minor fixups.
+# AUTHORS: Robert Hooker (Sarvatt), Tormod Volden
 #
+# History:
+# v0.1   - 2009-07-28: Initial Revision.
+# v0.2   - 2009-07-29: Add warnings, don't remove this package if it exists in the PPA.
+# v0.2.2 - 2009-08-05: Fix command option parsing errors.
+# v0.2.3 - 2009-08-06: Removed -v option, script will always be verbose. Also minor fixups.
+# v0.2.4 - 2009-08-13: Package dependencies
+# v0.2.5 - 2009-09-30: New command syntax, various code rewrites
 # Questions? contact sarvatt@gmail.com
 
 # Defaults
+PPAHOST=ppa.launchpad.net
+PPANAME=${PPANAME:-ppa}
+
 DIST=$(lsb_release -c -s)
 ARCH=$(dpkg --print-architecture)
-PPANAME=${PPANAME:-ppa}
 PPA_PKGS=$(mktemp)
 REVERTS=$(mktemp)
 trap "rm $PPA_PKGS $REVERTS" 0
@@ -72,34 +76,33 @@ if [ "$(id -u)" != "0" ]; then
 	warn "This script would need superuser privileges, use sudo"
 fi
 
-echo;msg "Architecture:						$ARCH"
-msg "Distribution:						$DIST"
-msg "PPA to be removed: 					$PPAOWNER $PPANAME";echo;echo
+msg "PPA to be removed: $PPAOWNER $PPANAME"
 
 # Make list of all packages in PPA
-PPA_LIST=/var/lib/apt/lists/ppa.launchpad.net_${PPAOWNER}_${PPANAME}_*_Packages
+PPA_LIST=/var/lib/apt/lists/${PPAHOST}_${PPAOWNER}_${PPANAME}_*_Packages
 grep "Package: " $PPA_LIST | cut -d " " -f2 | sort > $PPA_PKGS
 
-echo;msg "File $PPA_PKGS containing a list of all packages in the ${PPAOWNER}-${PPANAME} PPA created."
+msg "File $PPA_PKGS containing a list of all packages in the PPA created."
 
 # Don't remove ppa-purge (this package) if it exists in the PPA package list.
 if grep -q "ppa-purge" $PPA_PKGS ; then
-        sed -i '/ppa-purge/d' $PPA_PKGS
+	sed -i '/ppa-purge/d' $PPA_PKGS
 	msg "ppa-purge detected in the PPA, not removing."
 fi
 
 dpkg --get-selections | awk '/install$/{print $1}' |
      sort | comm -12 - $PPA_PKGS > $REVERTS
-echo;msg "File $REVERTS created."
+msg "File $REVERTS with the list of packages to revert created"
 
 # Create apt-get argument list for reverting packages
 REINSTALL=""
-for PACKAGE in $(cat $REVERT); do
+for PACKAGE in $(cat $REVERTS); do
 	REINSTALL="$REINSTALL $PACKAGE/$DIST"
 done
 
-echo;msg "Package removal list generated."
-echo;msg "Packages:  $REINSTALL";echo
+msg "Package removal list generated."
+msg "Packages:  $REINSTALL"
+echo
 
 # Disable PPA from sources.list files
 for LIST in /etc/apt/sources.list /etc/apt/sources.list.d/*.list; do
@@ -109,18 +112,20 @@ for LIST in /etc/apt/sources.list /etc/apt/sources.list.d/*.list; do
 	fi
 done
 
-apt-get update >/dev/null || warn "Apt-get update failed for some reason. Giving up."
+msg "Running apt-get update"
+apt-get update > /dev/null || warn "Apt-get update failed for some reason. Giving up."
 
 # FIXME:
-# Workaround for now incase apt-get fails because of a package not in ubuntu. Aptitude actually works
-# but it would be preferred to remove the package from $REINSTALL directly.
+# Workaround for now in case apt-get fails because of a package not in Ubuntu.
+# Aptitude actually works but it would be preferred to remove the package
+# from $REINSTALL directly.
 
-if apt-get install ${REINSTALL} ; then
-	echo;msg "PPA Purged!"
-elif aptitude install ${REINSTALL} ; then
-	echo;msg "Package not included in Ubuntu detected, falling back to aptitude to work around it.";echo
+if apt-get install $REINSTALL ; then
+	msg "PPA purged successfully"
+elif aptitude install $REINSTALL ; then
+	msg "PPA purged successfully using aptitude fallback"
 else
-	warn "Something went wrong. Giving up.";exit 1
+	warn "Something went wrong, packages may not have been reverted"
+	exit 1
 fi
-
 exit 0
