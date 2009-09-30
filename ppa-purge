@@ -86,14 +86,9 @@ echo;msg "Architecture:						$ARCH"
 msg "Distribution:						$DIST"
 msg "PPA to be removed: 					$PPAOWNER $PPANAME";echo;echo
 
-# Initialize temporary logs.
-if [ $PPANAME == "ppa" ]; then
-	cat /var/lib/apt/lists/ppa.launchpad.net_${PPAOWNER}_ppa_ubuntu_dists_${DIST}_main_binary-${ARCH}_Packages | \
-	grep "Package: " | cut -d " " -f2 | sort -n - > ${PPA_PKGS};
-else
-	cat /var/lib/apt/lists/ppa.launchpad.net_${PPAOWNER}_${PPANAME}_ubuntu_dists_${DIST}_main_binary-${ARCH}_Packages | \
-	grep "Package: " | cut -d " " -f2 | sort -n - > ${PPA_PKGS};
-fi
+# Make list of all packages in PPA
+cat /var/lib/apt/lists/ppa.launchpad.net_${PPAOWNER}_${PPANAME}_ubuntu_dists_${DIST}_main_binary-${ARCH}_Packages | \
+grep "Package: " | cut -d " " -f2 | sort -n - > ${PPA_PKGS};
 
 echo;msg "File $PPA_PKGS containing a list of all packages in the ${PPAOWNER}-${PPANAME} PPA created."
 
