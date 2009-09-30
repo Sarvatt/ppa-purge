@@ -112,7 +112,7 @@ echo
 # Disable PPA from sources.list files
 for LIST in /etc/apt/sources.list /etc/apt/sources.list.d/*.list; do
 	if [ -e $LIST ] && grep -q $PPAOWNER/$PPANAME $LIST; then
-		sudo sed -i "\:^[^#]+/${PPAOWNER}/${PPANAME}/:s/^deb/# deb/" $LIST
+		sed -i "\:^[^#]+/${PPAOWNER}/${PPANAME}/:s/^deb/# deb/" $LIST
 		msg "$PPAOWNER PPA disabled from $LIST"
 	fi
 done
