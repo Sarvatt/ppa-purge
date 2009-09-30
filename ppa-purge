@@ -130,7 +130,7 @@ fi
 echo;echo -n "Press enter to complete the purge..."
 read nothing
 
-sed -i "/ ${PPAOWNER}\/${PPANAME}/s/^# deb/deb/;/${PPAOWNER}\/${PPANAME}/s/^deb/# deb/" ${SOURCES}
+sed -i "\:/${PPAOWNER}/${PPANAME}/:s/^# deb/deb/;\:/${PPAOWNER}/${PPANAME}/:s/^deb/# deb/" ${SOURCES}
 echo;msg "$PPAOWNER PPA removed from sources."
 
 apt-get update >/dev/null || warn "Apt-get update failed for some reason. Giving up."
