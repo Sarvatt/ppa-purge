@@ -144,8 +144,12 @@ apt-get update >/dev/null || warn "Apt-get update failed for some reason. Giving
 # Workaround for now incase apt-get fails because of a package not in ubuntu. Aptitude actually works
 # but it would be preferred to remove the package from $APTLINE directly.
 
-apt-get install ${APTLINE} || echo;msg "Package not included in ubuntu detected, falling back to aptitude to work around it.";echo;aptitude install ${APTLINE} || warn "Something went wrong. Giving up.";exit 1
-
-echo;msg "PPA Purged!"
+if apt-get install ${APTLINE} ; then
+	echo;msg "PPA Purged!"
+elif aptitude install ${APTLINE} ; then
+	echo;msg "Package not included in Ubuntu detected, falling back to aptitude to work around it.";echo
+else
+	warn "Something went wrong. Giving up.";exit 1
+fi
 
 exit 0
