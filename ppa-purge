@@ -85,18 +85,18 @@ msg "PPA to be removed: 					$PPAOWNER $PPANAME";echo;echo
 
 # Make list of all packages in PPA
 PPA_LIST=/var/lib/apt/lists/ppa.launchpad.net_${PPAOWNER}_${PPANAME}_*_Packages
-grep "Package: " $PPA_LIST | cut -d " " -f2 | sort -n - > $PPA_PKGS
+grep "Package: " $PPA_LIST | cut -d " " -f2 | sort > $PPA_PKGS
 
 echo;msg "File $PPA_PKGS containing a list of all packages in the ${PPAOWNER}-${PPANAME} PPA created."
 
 # Don't remove ppa-purge (this package) if it exists in the PPA package list.
-if [ -n `grep "ppa-purge" ${PPA_PKGS}` ]; then
-        sed -i '/ppa-purge/d' ${PPA_PKGS}
+if grep -q "ppa-purge" $PPA_PKGS ; then
+        sed -i '/ppa-purge/d' $PPA_PKGS
 	msg "ppa-purge detected in the PPA, not removing."
 fi
 
 dpkg --get-selections | awk '/install$/{print $1}' |
-     sort -n - | comm -12 - $PPA_PKGS > $REVERTS
+     sort | comm -12 - $PPA_PKGS > $REVERTS
 echo;msg "File $REVERTS created."
 
 # Create apt-get argument list for reverting packages
