@@ -108,19 +108,13 @@ done
 echo;msg "Package removal list generated."
 echo;msg "Packages:  $REINSTALL";echo
 
-# Check if the PPA is in /etc/apt/sources.list, or a seperate file in
-# /etc/apt/sources.list.d/ and store SOURCES accordingly.
-
-if [ -z "$(grep $PPAOWNER /etc/apt/sources.list)" ]
-then
-	SOURCES=$(grep -R -l "${PPAOWNER}/${PPANAME}" /etc/apt/sources.list.d/)
-	echo;msg "$PPAOWNER apt sources found at non-standard location $SOURCES"
-else
-	echo;msg "$PPAOWNER apt sources found in standard location (/etc/apt/sources.list)"
-fi
-
-sed -i "\:^[^#]+/${PPAOWNER}/${PPANAME}/:s/^deb/# deb/" ${SOURCES}
-echo;msg "$PPAOWNER PPA removed from sources."
+# Disable PPA from sources.list files
+for LIST in /etc/apt/sources.list /etc/apt/sources.list.d/*.list; do
+	if [ -e $LIST ] && grep -q $PPAOWNER/$PPANAME $LIST; then
+		sudo sed -i "\:^[^#]+/${PPAOWNER}/${PPANAME}/:s/^deb/# deb/" $LIST
+		msg "$PPAOWNER PPA disabled from $LIST"
+	fi
+done
 
 apt-get update >/dev/null || warn "Apt-get update failed for some reason. Giving up."
 
