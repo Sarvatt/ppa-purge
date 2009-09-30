@@ -20,9 +20,6 @@ PPANAME=${PPANAME:-ppa}
 PPA_PKGS=$(mktemp)
 REVERTS=$(mktemp)
 trap "rm $PPA_PKGS $REVERTS" 0
-REINSTALL=""
-PACKAGELIST=""
-i=1
 
 # Functions to write output nicely.
 write_msg() {
@@ -102,17 +99,12 @@ dpkg --get-selections | awk '/install$/{print $1}' |
      sort -n - | comm -12 - $PPA_PKGS > $REVERTS
 echo;msg "File $REVERTS created."
 
-# Store number of packages in the PPA list for later use
-x=`wc -l $REVERTS | cut -d" " -f1`
-
-# Create apt-get invocation args from package lists in the logs.
-while [ $i -le $x ]
-do
-	REINSTALL=${REINSTALL}" `head -$i $REVERTS | tail -1`/"$DIST
-	i=`expr $i + 1`
+# Create apt-get argument list for reverting packages
+REINSTALL=""
+for PACKAGE in $(cat $REVERT); do
+	REINSTALL="$REINSTALL $PACKAGE/$DIST"
 done
 
-echo;msg "Number of packages installed from the $PPANAME PPA:		${x}"
 echo;msg "Package removal list generated."
 echo;msg "Packages:  $REINSTALL";echo
 
