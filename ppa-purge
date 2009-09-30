@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # A script to remove all packages in a PPA and revert back to the normal
 # distribution ones.
 #
