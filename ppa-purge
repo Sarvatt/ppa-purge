@@ -15,7 +15,7 @@
 
 # Defaults
 PPAHOST=ppa.launchpad.net
-PPANAME=${PPANAME:-ppa}
+PPANAME=ppa
 
 DIST=$(lsb_release -c -s)
 ARCH=$(dpkg --print-architecture)
@@ -39,8 +39,12 @@ warn() {
 usage() {
 	echo "Usage: sudo ppa-purge [options] <ppa-name>"
 	echo
-	echo "This script will reset all packages from a PPA of your choice to the standard ones"
-	echo "released for your distribution. It must be run with superuser privileges."
+	echo "ppa-purge will reset all packages from a PPA to the standard"
+	echo "versions released for your distribution."
+	echo
+	echo "Options:"
+	echo "	-p [ppa]	Name of the PPA to be reset (default: ppa)"
+	echo "	-h      	Display this help text"
 	echo
 	echo "Example usage commands:"
 	echo "	sudo ppa-purge xorg-edgers"
@@ -49,8 +53,6 @@ usage() {
 	echo "	sudo ppa-purge -p xorg-testing sarvatt"
 	echo "		Will remove https://launchpad.net/~sarvatt/+archive/xorg-testing"
 	echo
-	echo "Options:"
-	echo "	-p [ppa]  	Name of the PPA to be reset (lowercase)	 	    	default: ppa"
 	exit $1
 }
 
@@ -81,23 +83,20 @@ msg "PPA to be removed: $PPAOWNER $PPANAME"
 # Make list of all packages in PPA
 PPA_LIST=/var/lib/apt/lists/${PPAHOST}_${PPAOWNER}_${PPANAME}_*_Packages
 if [ -e $PPA_LIST ]; then
-	grep "Package: " $PPA_LIST | cut -d " " -f2 | sort > $PPA_PKGS
+	grep "^Package: " $PPA_LIST | cut -d " " -f2 | sort > $PPA_PKGS
 else
-	warn "Could not find package list for PPA"
+	warn "Could not find package list for PPA: $PPAOWNER $PPANAME"
 	exit 1
 fi
 
-msg "File $PPA_PKGS containing a list of all packages in the PPA created."
-
 # Don't remove ppa-purge (this package) if it exists in the PPA package list.
-if grep -q "ppa-purge" $PPA_PKGS ; then
+if grep -q "ppa-purge" $PPA_PKGS; then
 	sed -i '/ppa-purge/d' $PPA_PKGS
-	msg "ppa-purge detected in the PPA, not removing."
+	msg "Note: Not removing ppa-purge package"
 fi
 
 dpkg --get-selections | awk '/install$/{print $1}' |
      sort | comm -12 - $PPA_PKGS > $REVERTS
-msg "File $REVERTS with the list of packages to revert created"
 
 # Create apt-get argument list for reverting packages
 REINSTALL=""
@@ -105,29 +104,29 @@ for PACKAGE in $(cat $REVERTS); do
 	REINSTALL="$REINSTALL $PACKAGE/$DIST"
 done
 
-msg "Package removal list generated."
-msg "Packages:  $REINSTALL"
+msg "Package revert list generated:"
+msg "$REINSTALL"
 echo
 
 # Disable PPA from sources.list files
 for LIST in /etc/apt/sources.list /etc/apt/sources.list.d/*.list; do
 	if [ -e $LIST ] && grep -q $PPAOWNER/$PPANAME $LIST; then
+		msg "Disabling $PPAOWNER PPA from $LIST"
 		sed -i "\:^[^#]+/${PPAOWNER}/${PPANAME}/:s/^deb/# deb/" $LIST
-		msg "$PPAOWNER PPA disabled from $LIST"
 	fi
 done
 
 msg "Running apt-get update"
-apt-get update > /dev/null || warn "Apt-get update failed for some reason. Giving up."
+apt-get update > /dev/null || warn "apt-get update failed for some reason"
 
 # FIXME:
 # Workaround for now in case apt-get fails because of a package not in Ubuntu.
 # Aptitude actually works but it would be preferred to remove the package
 # from $REINSTALL directly.
 
-if apt-get install $REINSTALL ; then
+if apt-get install $REINSTALL; then
 	msg "PPA purged successfully"
-elif aptitude install $REINSTALL ; then
+elif aptitude install $REINSTALL; then
 	msg "PPA purged successfully using aptitude fallback"
 else
 	warn "Something went wrong, packages may not have been reverted"
