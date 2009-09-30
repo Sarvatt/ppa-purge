@@ -98,8 +98,8 @@ if [ -n `grep "ppa-purge" ${PPA_PKGS}` ]; then
 	msg "ppa-purge detected in the PPA, not removing."
 fi
 
-
-dpkg -l | cut -d' ' -f3 | sort -n - | comm -12 - $PPA_PKGS > $REVERTS
+dpkg --get-selections | awk '/install$/{print $1}' |
+     sort -n - | comm -12 - $PPA_PKGS > $REVERTS
 echo;msg "File $REVERTS created."
 
 # Store number of packages in the PPA list for later use
