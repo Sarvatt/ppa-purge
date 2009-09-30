@@ -69,8 +69,7 @@ if [ -z "$PPAOWNER" ]; then
 fi
 
 if [ "$(id -u)" != "0" ]; then
-	warn "This script must be run with superuser privileges."
-	usage 1
+	warn "This script would need superuser privileges, use sudo"
 fi
 
 echo;msg "Architecture:						$ARCH"
