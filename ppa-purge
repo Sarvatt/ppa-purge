@@ -80,7 +80,12 @@ msg "PPA to be removed: $PPAOWNER $PPANAME"
 
 # Make list of all packages in PPA
 PPA_LIST=/var/lib/apt/lists/${PPAHOST}_${PPAOWNER}_${PPANAME}_*_Packages
-grep "Package: " $PPA_LIST | cut -d " " -f2 | sort > $PPA_PKGS
+if [ -e $PPA_LIST ]; then
+	grep "Package: " $PPA_LIST | cut -d " " -f2 | sort > $PPA_PKGS
+else
+	warn "Could not find package list for PPA"
+	exit 1
+fi
 
 msg "File $PPA_PKGS containing a list of all packages in the PPA created."
 
