@@ -1,5 +1,6 @@
 ppa-purge (0.2.5) UNRELEASED; urgency=low
 
+  * New usage: ppa-purge [options] <ppa> (not the other way)
   * use dpkg --print-architecture and drop depends on dpkg-dev
   * debian/control: Architecture: all
   * debian/control: update to Standards 3.8.3 (no changes needed)

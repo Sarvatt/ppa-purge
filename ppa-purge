@@ -33,7 +33,7 @@ warn() {
 }
 
 usage() {
-	echo "Usage: sudo ppa-purge <ppa-name> [options]"
+	echo "Usage: sudo ppa-purge [options] <ppa-name>"
 	echo
 	echo "This script will reset all packages from a PPA of your choice to the standard ones"
 	echo "released for your distribution. It must be run with superuser privileges."
@@ -42,19 +42,13 @@ usage() {
 	echo "	sudo ppa-purge xorg-edgers"
 	echo "		Will remove https://launchpad.net/~xorg-edgers/+archive/ppa"
 	echo
-	echo "	sudo ppa-purge sarvatt -p xorg-testing"
+	echo "	sudo ppa-purge -p xorg-testing sarvatt"
 	echo "		Will remove https://launchpad.net/~sarvatt/+archive/xorg-testing"
-	echo
-	echo "	sudo ppa-purge sarvatt -p xorg-testing -t /opt"
-	echo "		Will remove https://launchpad.net/~sarvatt/+archive/xorg-testing, store log"
-	echo "		log files in /opt/"
 	echo
 	echo "Options:"
 	echo "	-p [ppa]  	Name of the PPA to be reset (lowercase)	 	    	default: ppa"
 	exit $1
 }
-
-PPAOWNER=$1 && shift
 
 # Command line options
 while getopts "p:h\?" opt; do
@@ -66,6 +60,8 @@ while getopts "p:h\?" opt; do
 	esac
 done
 shift $(($OPTIND -1))
+
+PPAOWNER=$1
 
 if [ -z "$PPAOWNER" ]; then
 	warn "Required ppa-name argument was not specified"
