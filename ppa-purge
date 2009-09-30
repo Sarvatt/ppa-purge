@@ -17,7 +17,9 @@ ARCH=$(dpkg --print-architecture)
 SOURCES=${SOURCES:-/etc/apt/sources.list}
 PPAOWNER=${PPAOWNER:-}
 PPANAME=${PPANAME:-ppa}
-TEMPDIR=${TEMPDIR:-/tmp}
+PPA_PKGS=$(mktemp)
+REVERTS=$(mktemp)
+trap "rm $PPA_PKGS $REVERTS" 0
 APTLINE=""
 PACKAGELIST=""
 i=1
@@ -54,17 +56,15 @@ usage() {
 	echo
 	echo "Options:"
 	echo "	-p [ppa]  	Name of the PPA to be reset (lowercase)	 	    	default: ppa"
-	echo "	-t [directory]	Directory to store logs	(no trailing slash)		default: /tmp"
 	exit $1
 }
 
 PPAOWNER=$1 && shift
 
 # Command line options
-while getopts "p:t:h\?" opt; do
+while getopts "p:h\?" opt; do
 	case "$opt" in
 		p ) PPANAME="$OPTARG"				;;
-		t ) TEMPDIR="$OPTARG"				;;
 		h ) usage 0;					;;
 		\?) usage 1;					;;
 		* ) warn "Unknown option '$opt'"; usage 1;	;;
@@ -84,40 +84,36 @@ fi
 
 echo;msg "Architecture:						$ARCH"
 msg "Distribution:						$DIST"
-msg "Temporary log directory:				${TEMPDIR}"
 msg "PPA to be removed: 					$PPAOWNER $PPANAME";echo;echo
-
-# Initialize PPALIST after command line options are read.
-PPALIST=${TEMPDIR}/${PPAOWNER}-${PPANAME}.log
 
 # Initialize temporary logs.
 if [ $PPANAME == "ppa" ]; then
 	cat /var/lib/apt/lists/ppa.launchpad.net_${PPAOWNER}_ppa_ubuntu_dists_${DIST}_main_binary-${ARCH}_Packages | \
-	grep "Package: " | cut -d " " -f2 | sort -n - > ${PPALIST};
+	grep "Package: " | cut -d " " -f2 | sort -n - > ${PPA_PKGS};
 else
 	cat /var/lib/apt/lists/ppa.launchpad.net_${PPAOWNER}_${PPANAME}_ubuntu_dists_${DIST}_main_binary-${ARCH}_Packages | \
-	grep "Package: " | cut -d " " -f2 | sort -n - > ${PPALIST};
+	grep "Package: " | cut -d " " -f2 | sort -n - > ${PPA_PKGS};
 fi
 
-echo;msg "File $PPALIST containing a list of all packages in the ${PPAOWNER}-${PPANAME} PPA created."
+echo;msg "File $PPA_PKGS containing a list of all packages in the ${PPAOWNER}-${PPANAME} PPA created."
 
 # Don't remove ppa-purge (this package) if it exists in the PPA package list.
-if [ -n `grep "ppa-purge" ${PPALIST}` ]; then
-        sed -i '/ppa-purge/d' ${PPALIST}
+if [ -n `grep "ppa-purge" ${PPA_PKGS}` ]; then
+        sed -i '/ppa-purge/d' ${PPA_PKGS}
 	msg "ppa-purge detected in the PPA, not removing."
 fi
 
 
-dpkg -l | cut -d' ' -f3 | sort -n - | comm -12 - $PPALIST >${TEMPDIR}/packages-to-remove.log
-echo;msg "File ${TEMPDIR}/packages-to-remove.log created."
+dpkg -l | cut -d' ' -f3 | sort -n - | comm -12 - $PPA_PKGS > $REVERTS
+echo;msg "File $REVERTS created."
 
 # Store number of packages in the PPA list for later use
-x=`wc -l ${TEMPDIR}/packages-to-remove.log | cut -d" " -f1`
+x=`wc -l $REVERTS | cut -d" " -f1`
 
 # Create apt-get invocation args from package lists in the logs.
 while [ $i -le $x ]
 do
-	APTLINE=${APTLINE}" `head -$i ${TEMPDIR}/packages-to-remove.log | tail -1`/"$DIST
+	APTLINE=${APTLINE}" `head -$i $REVERTS | tail -1`/"$DIST
 	i=`expr $i + 1`
 done
 
