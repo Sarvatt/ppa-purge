@@ -112,7 +112,7 @@ echo
 for LIST in /etc/apt/sources.list /etc/apt/sources.list.d/*.list; do
 	if [ -e $LIST ] && grep -q $PPAOWNER/$PPANAME $LIST; then
 		msg "Disabling $PPAOWNER PPA from $LIST"
-		sed -i "\:^[^#]+/${PPAOWNER}/${PPANAME}/:s/^deb/# deb/" $LIST
+		sed -ri "\:^[^#]+/${PPAOWNER}/${PPANAME}/:s/^deb/# deb/" $LIST
 	fi
 done
 
