@@ -44,6 +44,7 @@ usage() {
 	echo
 	echo "Options:"
 	echo "	-p [ppa]	Name of the PPA to be reset (default: ppa)"
+	echo "	-s [host]	Repository server (default: ppa.launchpad.net)"
 	echo "	-h      	Display this help text"
 	echo
 	echo "Example usage commands:"
@@ -57,9 +58,10 @@ usage() {
 }
 
 # Command line options
-while getopts "p:h\?" opt; do
+while getopts "p:s:h\?" opt; do
 	case "$opt" in
 		p ) PPANAME="$OPTARG"				;;
+		s ) PPAHOST="$OPTARG"				;;
 		h ) usage 0;					;;
 		\?) usage 1;					;;
 		* ) warn "Unknown option '$opt'"; usage 1;	;;
