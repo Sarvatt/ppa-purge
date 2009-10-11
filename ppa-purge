@@ -82,14 +82,18 @@ msg "PPA to be removed: $PPAOWNER $PPANAME"
 
 # Make list of all packages in PPA
 PPA_LIST=/var/lib/apt/lists/${PPAHOST}_${PPAOWNER}_${PPANAME}_*_Packages
-if [ -e $PPA_LIST ]; then
-	grep "^Package: " $PPA_LIST | cut -d " " -f2 | sort > $PPA_PKGS
-else
+for LIST in $PPA_LIST; do
+	if [ -e $LIST ]; then
+		grep "^Package: " $LIST | cut -d " " -f2 | sort >> $PPA_PKGS
+	fi
+done
+
+if [ ! -s $PPA_PKGS ]; then
 	warn "Could not find package list for PPA: $PPAOWNER $PPANAME"
 	exit 1
 fi
 
-# Don't remove ppa-purge (this package) if it exists in the PPA package list.
+# Ignore the ppa-purge package
 if grep -q "ppa-purge" $PPA_PKGS; then
 	sed -i '/ppa-purge/d' $PPA_PKGS
 	msg "Note: Not removing ppa-purge package"
