@@ -47,11 +47,14 @@ usage() {
 	echo "	-h      	Display this help text"
 	echo
 	echo "Example usage commands:"
-	echo "	sudo ppa-purge xorg-edgers"
-	echo "		Will remove https://launchpad.net/~xorg-edgers/+archive/ppa"
+	echo "	  sudo ppa-purge xorg-edgers"
+	echo "	will remove https://launchpad.net/~xorg-edgers/+archive/ppa"
 	echo
-	echo "	sudo ppa-purge -p xorg-testing sarvatt"
-	echo "		Will remove https://launchpad.net/~sarvatt/+archive/xorg-testing"
+	echo "	  sudo ppa-purge -p xorg-testing sarvatt"
+	echo "	will remove https://launchpad.net/~sarvatt/+archive/xorg-testing"
+	echo
+	echo "	  sudo ppa-purge ppa:ubuntu-x-swat/x-updates"
+	echo "	will remove https://launchpad.net/~ubuntu-x-swat/+archive/x-updates"
 	echo
 	exit $1
 }
@@ -69,6 +72,11 @@ done
 shift $(($OPTIND -1))
 
 PPAOWNER=$1
+
+if echo $1 | grep -q "^ppa:"; then
+	PPAOWNER=$(echo $1 | sed "s#^ppa:\(.*\)/\(.*$\)#\1#")
+	PPANAME=$(echo $1 | sed "s#^ppa:\(.*\)/\(.*$\)#\2#")
+fi
 
 if [ -z "$PPAOWNER" ]; then
 	warn "Required ppa-name argument was not specified"
