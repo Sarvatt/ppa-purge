@@ -52,12 +52,12 @@ install: build
 	#$(MAKE) DESTDIR=$(CURDIR)/debian/ppa-purge install
 
 
-# Build architecture-independent files here.
-binary-indep: install
-# We have nothing to do by default.
-
 # Build architecture-dependent files here.
 binary-arch: install
+# We have nothing to do by default.
+
+# Build architecture-independent files here.
+binary-indep: install
 	dh_testdir
 	dh_testroot
 	dh_installchangelogs 
@@ -86,7 +86,7 @@ binary-arch: install
 	dh_gencontrol
 	dh_md5sums
 	install --mode=755 -t debian/ppa-purge/usr/bin ppa-purge
-	dh_builddeb -s -- -Zlzma
+	dh_builddeb -i -- -Zlzma
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install configure
