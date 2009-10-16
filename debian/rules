@@ -61,6 +61,7 @@ binary-indep: install
 	dh_testdir
 	dh_testroot
 	dh_installchangelogs 
+	install --mode=755 -t debian/ppa-purge/usr/bin ppa-purge
 #	dh_installdocs
 #	dh_installexamples
 #	dh_install
@@ -85,7 +86,6 @@ binary-indep: install
 	dh_shlibdeps
 	dh_gencontrol
 	dh_md5sums
-	install --mode=755 -t debian/ppa-purge/usr/bin ppa-purge
 	dh_builddeb -i -- -Zlzma
 
 binary: binary-indep binary-arch
