@@ -1,3 +1,9 @@
+ppa-purge (0.2.6) lucid; urgency=low
+
+  * No change version bump for packaging purposes.
+
+ -- Robert Hooker <sarvatt@ubuntu.com>  Sat, 05 Dec 2009 15:28:19 -0500
+
 ppa-purge (0.2.5) karmic; urgency=low
 
   * New syntax: ppa-purge [options] <ppa> (not the other way)
