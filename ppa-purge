@@ -57,6 +57,10 @@ usage() {
 	echo "	  sudo ppa-purge ppa:ubuntu-x-swat/x-updates"
 	echo "	will remove https://launchpad.net/~ubuntu-x-swat/+archive/x-updates"
 	echo
+	echo "Notice: If ppa-purge fails for some reason and you wish to try again,"
+	echo "(For example: you left synaptic open while attempting to run it) simply"
+	echo "uncomment the PPA from your sources, run apt-get update and try again."
+	echo
 	exit $1
 }
 
