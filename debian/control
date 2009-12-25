@@ -1,7 +1,7 @@
 Source: ppa-purge
 Section: admin
 Priority: extra
-Maintainer: Robert Hooker (Sarvatt) <sarvatt@gmail.com>
+Maintainer: Robert Hooker <sarvatt@ubuntu.com>
 Build-Depends: debhelper (>= 7)
 Standards-Version: 3.8.3
 Vcs-Bzr: https://code.launchpad.net/~xorg-edgers/ppa-purge/ubuntu
