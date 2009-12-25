@@ -1,6 +1,6 @@
 This package was debianized by:
 
-    Robert Hooker (Sarvatt) <sarvatt@gmail.com> on Wed, 29 Jul 2009 04:01:34 -0400
+    Robert Hooker <sarvatt@ubuntu.com> on Wed, 29 Jul 2009 04:01:34 -0400
 
 Copyright:
 
@@ -26,6 +26,6 @@ Public License version 3 can be found in `/usr/share/common-licenses/GPL-3'.
 
 The Debian packaging is:
 
-    Copyright (C) 2009 Robert Hooker (Sarvatt) <sarvatt@gmail.com>
+    Copyright (C) 2009 Robert Hooker <sarvatt@ubuntu.com>
 
 and is licensed under the GPL version 3, see above.
