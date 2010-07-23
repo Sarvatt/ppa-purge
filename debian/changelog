@@ -1,49 +1,5 @@
-ppa-purge (0.2.6) lucid; urgency=low
+ppa-purge (0+bzr46.1) maverick; urgency=low
 
-  * No change version bump for packaging purposes.
+  * Initial Ubuntu release (LP: #521449)
 
- -- Robert Hooker <sarvatt@ubuntu.com>  Sat, 05 Dec 2009 15:28:19 -0500
-
-ppa-purge (0.2.5) karmic; urgency=low
-
-  * New syntax: ppa-purge [options] <ppa> (not the other way)
-  * New option -s for repository server hostname
-  * Accept the ppa:owner/name URI as well
-  * use dpkg --print-architecture and drop depends on dpkg-dev
-  * debian/control: Architecture: all
-  * debian/control: update to Standards 3.8.3 (no changes needed)
-
- -- Tormod Volden <debian.tormod@gmail.com>  Wed, 30 Sep 2009 00:58:31 +0200
-
-ppa-purge (0.2.4) karmic; urgency=low
-
-  * Add dpkg-dev to depends for dpkg-architecture.
-
- -- Robert Hooker <sarvatt@ubuntu.com>  Wed, 12 Aug 2009 20:51:48 -0400
-
-ppa-purge (0.2.3) karmic; urgency=low
-
-  * Remove -v option, make the script always verbose.
-  * Minor fixups and warnings added.
-
- -- Robert Hooker <sarvatt@ubuntu.com>  Thu, 06 Aug 2009 14:59:18 -0400
-
-ppa-purge (0.2.2) karmic; urgency=low
-
-  * Fix command option parsing errors.
-
- -- Robert Hooker (Sarvatt) <sarvatt@gmail.com>  Wed, 05 Aug 2009 09:13:35 -0400
-
-ppa-purge (0.2) karmic; urgency=low
-
-  * Don't remove ppa-purge if the package exists in the PPA list.
-  * Add error message if PPA = xorg-edgers with a notice that libdrm-radeon1
-    has to be manually removed afterwards.
-
- -- Robert Hooker (Sarvatt) <sarvatt@gmail.com>  Wed, 29 Jul 2009 08:51:35 -0400
-
-ppa-purge (0.1) karmic; urgency=low
-
-  * Initial Release.
-
- -- Robert Hooker (Sarvatt) <sarvatt@gmail.com>  Wed, 29 Jul 2009 04:01:34 -0400
+ -- Lorenzo De Liso <blackz@ubuntu.com>  Fri, 23 Jul 2010 00:02:50 +0200
