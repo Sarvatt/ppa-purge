@@ -43,9 +43,10 @@ usage() {
 	echo "versions released for your distribution."
 	echo
 	echo "Options:"
-	echo "	-p [ppa]	Name of the PPA to be reset (default: ppa)"
-	echo "	-s [host]	Repository server (default: ppa.launchpad.net)"
-	echo "	-h      	Display this help text"
+	echo "	-p [ppa]		Name of the PPA to be reset (default: ppa)"
+	echo "	-s [host]		Repository server (default: ppa.launchpad.net)"
+	echo "  -d [distribution]	Override the default distribution choice."
+	echo "	-h      		Display this help text"
 	echo
 	echo "Example usage commands:"
 	echo "	  sudo ppa-purge xorg-edgers"
@@ -65,10 +66,11 @@ usage() {
 }
 
 # Command line options
-while getopts "p:s:h\?" opt; do
+while getopts "p:s:d:h\?" opt; do
 	case "$opt" in
 		p ) PPANAME="$OPTARG"				;;
 		s ) PPAHOST="$OPTARG"				;;
+		d ) DIST="$OPTARG"				;;
 		h ) usage 0;					;;
 		\?) usage 1;					;;
 		* ) warn "Unknown option '$opt'"; usage 1;	;;
