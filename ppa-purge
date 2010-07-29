@@ -12,6 +12,7 @@
 # v0.2.4 - 2009-08-13: Package dependencies
 # v0.2.5 - 2009-09-30: New command syntax, various code rewrites
 # v0.2.6 - 2009-12-05: No change version bump to fix packaging problems.
+# v0.2.7 - 2010-07-29: Add -d option, minor fixups.
 
 # Defaults
 PPAHOST=ppa.launchpad.net
@@ -92,6 +93,7 @@ fi
 
 if [ "$(id -u)" != "0" ]; then
 	warn "This script would need superuser privileges, use sudo"
+	usage 1
 fi
 
 msg "PPA to be removed: $PPAOWNER $PPANAME"

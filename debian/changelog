@@ -1,9 +1,10 @@
-ppa-purge (1) UNRELEASED; urgency=low
+ppa-purge (0.2.7) maverick; urgency=low
 
   * Add option to force the distribution name so it can work on
     ubuntu derivatives. (LP: #610376)
+  * Correctly exit when not invoked with sudo.
 
- -- Robert Hooker <sarvatt@ubuntu.com>  Tue, 27 Jul 2010 23:15:01 -0400
+ -- Robert Hooker <sarvatt@ubuntu.com>  Tue, 27 Jul 2010 23:23:44 -0400
 
 ppa-purge (0+bzr46.1) maverick; urgency=low
 
