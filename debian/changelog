@@ -1,10 +1,17 @@
-ppa-purge (0.2.7) maverick; urgency=low
+ppa-purge (0.2.7+bzr51.1) maverick; urgency=low
 
+  [ Robert Hooker ]
   * Add option to force the distribution name so it can work on
     ubuntu derivatives. (LP: #610376)
   * Correctly exit when not invoked with sudo.
 
- -- Robert Hooker <sarvatt@ubuntu.com>  Tue, 27 Jul 2010 23:23:44 -0400
+  [ Lorenzo De Liso ]
+  * Substituted my old e-mail address in the manpage with my
+    new one
+  * Changed Tormod Volden's e-mail address in debian/copyright
+    (upstream authors) as per his request
+
+ -- Lorenzo De Liso <blackz@ubuntu.com>  Tue, 03 Aug 2010 20:01:56 +0200
 
 ppa-purge (0+bzr46.1) maverick; urgency=low
 

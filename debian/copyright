@@ -6,7 +6,7 @@ Source: https://launchpad.net/ppa-purge
 Files: *
 Copyright:
  2009, Robert Hooker <sarvatt@ubuntu.com>
- 2009, Tormod Volden <tormod.volden@gmail.com>
+ 2009, Tormod Volden <debian.tormod@gmail.com>
 License: GPL-3
 
 Files: debian/*
