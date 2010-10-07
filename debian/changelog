@@ -1,3 +1,15 @@
+ppa-purge (0.2.7.1+bzr52) maverick; urgency=low
+
+  * FFe: LP: #655929
+  [ Eugene San (eugenesan) ]
+  * Fixed manpage and help screen.
+  * Fixed default values of variables.
+  [ Lorenzo De Liso ]
+  * Fixed the shebang
+  * Added "aptitude" to the dependencies (LP: #641142) 
+
+ -- Lorenzo De Liso <blackz@ubuntu.com>  Thu, 07 Oct 2010 19:37:19 +0200
+
 ppa-purge (0.2.7+bzr51.1) maverick; urgency=low
 
   [ Robert Hooker ]

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # A script to remove all packages in a PPA and revert back to the normal
 # distribution ones.
 #
@@ -13,12 +13,10 @@
 # v0.2.5 - 2009-09-30: New command syntax, various code rewrites
 # v0.2.6 - 2009-12-05: No change version bump to fix packaging problems.
 # v0.2.7 - 2010-07-29: Add -d option, minor fixups.
+# v0.2.7.1 - 2010-10-08: Fixed manpage and help screen, fixed default values
+#                        of variables, fixed the shebang
 
 # Defaults
-PPAHOST=ppa.launchpad.net
-PPANAME=ppa
-
-DIST=$(lsb_release -c -s)
 ARCH=$(dpkg --print-architecture)
 PPA_PKGS=$(mktemp)
 REVERTS=$(mktemp)
@@ -38,25 +36,25 @@ warn() {
 }
 
 usage() {
-	echo "Usage: sudo ppa-purge [options] <ppa-name>"
+	echo "Usage: sudo ppa-purge [options] <ppa:ppaowner>[/ppaname]"
 	echo
 	echo "ppa-purge will reset all packages from a PPA to the standard"
 	echo "versions released for your distribution."
 	echo
 	echo "Options:"
-	echo "	-p [ppa]		Name of the PPA to be reset (default: ppa)"
+	echo "	-p [ppaname]		PPA name to be disabled (default: ppa)"
 	echo "	-s [host]		Repository server (default: ppa.launchpad.net)"
-	echo "  -d [distribution]	Override the default distribution choice."
-	echo "	-h      		Display this help text"
+	echo "	-d [distribution]	Override the default distribution choice."
+	echo "	-h			Display this help text"
 	echo
 	echo "Example usage commands:"
-	echo "	  sudo ppa-purge xorg-edgers"
+	echo "	sudo ppa-purge xorg-edgers"
 	echo "	will remove https://launchpad.net/~xorg-edgers/+archive/ppa"
 	echo
-	echo "	  sudo ppa-purge -p xorg-testing sarvatt"
+	echo "	sudo ppa-purge -p xorg-testing sarvatt"
 	echo "	will remove https://launchpad.net/~sarvatt/+archive/xorg-testing"
 	echo
-	echo "	  sudo ppa-purge ppa:ubuntu-x-swat/x-updates"
+	echo "	sudo ppa-purge ppa:ubuntu-x-swat/x-updates"
 	echo "	will remove https://launchpad.net/~ubuntu-x-swat/+archive/x-updates"
 	echo
 	echo "Notice: If ppa-purge fails for some reason and you wish to try again,"
@@ -80,6 +78,11 @@ done
 shift $(($OPTIND -1))
 
 PPAOWNER=$1
+if [ ! -z "$APTALT" ]; then
+	APT=aptitude; APTALT=apt-get
+else
+	APT=apt-get; APTALT=aptitude
+fi
 
 if echo $1 | grep -q "^ppa:"; then
 	PPAOWNER=$(echo $1 | sed "s#^ppa:\(.*\)/\(.*$\)#\1#")
@@ -90,6 +93,11 @@ if [ -z "$PPAOWNER" ]; then
 	warn "Required ppa-name argument was not specified"
 	usage 1
 fi
+
+# If not set, using defaults
+[ -z "$PPAHOST" ] && PPAHOST="ppa.launchpad.net"
+[ -z "$PPANAME" ] && PPANAME="ppa"
+[ -z "$DIST" ] && DIST=$(lsb_release -c -s)
 
 if [ "$(id -u)" != "0" ]; then
 	warn "This script would need superuser privileges, use sudo"
@@ -120,7 +128,7 @@ fi
 dpkg --get-selections | awk '/install$/{print $1}' |
      sort | comm -12 - $PPA_PKGS > $REVERTS
 
-# Create apt-get argument list for reverting packages
+# Create apt argument list for reverting packages
 REINSTALL=""
 for PACKAGE in $(cat $REVERTS); do
 	REINSTALL="$REINSTALL $PACKAGE/$DIST"
@@ -138,18 +146,18 @@ for LIST in /etc/apt/sources.list /etc/apt/sources.list.d/*.list; do
 	fi
 done
 
-msg "Running apt-get update"
-apt-get update > /dev/null || warn "apt-get update failed for some reason"
+msg "Updating packages lists"
+$APT update > /dev/null || warn "$APT update failed for some reason"
 
 # FIXME:
-# Workaround for now in case apt-get fails because of a package not in Ubuntu.
-# Aptitude actually works but it would be preferred to remove the package
+# Workaround for now in case APT fails because of a package not in Ubuntu.
+# APTALT actually works but it would be preferred to remove the package
 # from $REINSTALL directly.
 
-if apt-get install $REINSTALL; then
+if $APT install $REINSTALL; then
 	msg "PPA purged successfully"
-elif aptitude install $REINSTALL; then
-	msg "PPA purged successfully using aptitude fallback"
+elif $APTALT install $REINSTALL; then
+	msg "PPA purged successfully using $APTALT fallback"
 else
 	warn "Something went wrong, packages may not have been reverted"
 	exit 1
