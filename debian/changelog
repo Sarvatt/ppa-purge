@@ -1,3 +1,10 @@
+ppa-purge (0.2.7.1+bzr53) maverick; urgency=low
+
+  * Really add "aptitude" to the dependencies and not to the
+    Build-Depends
+
+ -- Lorenzo De Liso <blackz@ubuntu.com>  Fri, 08 Oct 2010 14:24:32 +0200
+
 ppa-purge (0.2.7.1+bzr52) maverick; urgency=low
 
   * FFe: LP: #655929
