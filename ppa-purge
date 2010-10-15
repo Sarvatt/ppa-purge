@@ -3,18 +3,6 @@
 # distribution ones.
 #
 # AUTHORS: Robert Hooker (Sarvatt), Tormod Volden
-#
-# History:
-# v0.1   - 2009-07-28: Initial Revision.
-# v0.2   - 2009-07-29: Add warnings, do not remove ppa-purge package
-# v0.2.2 - 2009-08-05: Fix command option parsing errors
-# v0.2.3 - 2009-08-06: Removed verbose option. Also minor fixups
-# v0.2.4 - 2009-08-13: Package dependencies
-# v0.2.5 - 2009-09-30: New command syntax, various code rewrites
-# v0.2.6 - 2009-12-05: No change version bump to fix packaging problems.
-# v0.2.7 - 2010-07-29: Add -d option, minor fixups.
-# v0.2.7.1 - 2010-10-08: Fixed manpage and help screen, fixed default values
-#                        of variables, fixed the shebang
 
 # Defaults
 ARCH=$(dpkg --print-architecture)
@@ -45,6 +33,7 @@ usage() {
 	echo "	-p [ppaname]		PPA name to be disabled (default: ppa)"
 	echo "	-s [host]		Repository server (default: ppa.launchpad.net)"
 	echo "	-d [distribution]	Override the default distribution choice."
+	echo "	-i			Reverse preference of apt-get upon aptitude."
 	echo "	-h			Display this help text"
 	echo
 	echo "Example usage commands:"
@@ -65,11 +54,12 @@ usage() {
 }
 
 # Command line options
-while getopts "p:s:d:h\?" opt; do
+while getopts "p:s:d:ih\?" opt; do
 	case "$opt" in
 		p ) PPANAME="$OPTARG"				;;
 		s ) PPAHOST="$OPTARG"				;;
 		d ) DIST="$OPTARG"				;;
+		i ) APTALT="true" 				;;
 		h ) usage 0;					;;
 		\?) usage 1;					;;
 		* ) warn "Unknown option '$opt'"; usage 1;	;;
@@ -103,6 +93,9 @@ if [ "$(id -u)" != "0" ]; then
 	warn "This script would need superuser privileges, use sudo"
 	usage 1
 fi
+
+msg "Updating packages lists"
+$APT update > /dev/null || warn "$APT update failed for some reason"
 
 msg "PPA to be removed: $PPAOWNER $PPANAME"
 
@@ -139,7 +132,7 @@ msg "$REINSTALL"
 echo
 
 # Disable PPA from sources.list files
-for LIST in /etc/apt/sources.list /etc/apt/sources.list.d/*.list; do
+for LIST in for LIST in $(find /etc/apt/ -name "*.list" -exec readlink '{}' \;); do
 	if [ -e $LIST ] && grep -q $PPAOWNER/$PPANAME $LIST; then
 		msg "Disabling $PPAOWNER PPA from $LIST"
 		sed -ri "\:^[^#]+/${PPAOWNER}/${PPANAME}/:s/^deb/# deb/" $LIST

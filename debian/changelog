@@ -1,3 +1,16 @@
+ppa-purge (0.2.8+bzr54) natty; urgency=low
+
+  [ Eugene San (eugenesan) ]
+  * Added reverse order of apt tool usage and support for symlinked
+    lists.
+  * Added additional apt update on start.
+
+  [ Lorenzo De Liso ]
+  * Bumped Standard-Versions to 3.9.1, no additional changes required
+  * Removed the versions history
+
+ -- Lorenzo De Liso <blackz@ubuntu.com>  Fri, 15 Oct 2010 22:54:52 +0200
+
 ppa-purge (0.2.7.1+bzr53) maverick; urgency=low
 
   * Really add "aptitude" to the dependencies and not to the
