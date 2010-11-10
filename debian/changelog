@@ -1,3 +1,14 @@
+ppa-purge (0.2.8+bzr55) natty; urgency=low
+
+  [ chocolateboy ]
+  * Use "for LIST in" instead of repeating this one
+  * Execute readlink with the "-f" option for the symlink support
+
+  [ Alin Andrei ]
+  * Implement the "-y" option so any further input is required from the user
+
+ -- Lorenzo De Liso <blackz@ubuntu.com>  Tue, 09 Nov 2010 20:41:15 +0100
+
 ppa-purge (0.2.8+bzr54) natty; urgency=low
 
   [ Eugene San (eugenesan) ]

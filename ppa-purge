@@ -33,6 +33,7 @@ usage() {
 	echo "	-p [ppaname]		PPA name to be disabled (default: ppa)"
 	echo "	-s [host]		Repository server (default: ppa.launchpad.net)"
 	echo "	-d [distribution]	Override the default distribution choice."
+	echo "	-y 			Pass "-y --force-yes" to apt-get or "-y" to aptitude"
 	echo "	-i			Reverse preference of apt-get upon aptitude."
 	echo "	-h			Display this help text"
 	echo
@@ -59,6 +60,7 @@ while getopts "p:s:d:ih\?" opt; do
 		p ) PPANAME="$OPTARG"				;;
 		s ) PPAHOST="$OPTARG"				;;
 		d ) DIST="$OPTARG"				;;
+		y ) FORCEINSTALL="true"				;;
 		i ) APTALT="true" 				;;
 		h ) usage 0;					;;
 		\?) usage 1;					;;
@@ -68,9 +70,16 @@ done
 shift $(($OPTIND -1))
 
 PPAOWNER=$1
+APTARG=""
 if [ ! -z "$APTALT" ]; then
+	if [ ! -z "$FORCEINSTALL" ]; then
+	APTARG="-y"
+	fi
 	APT=aptitude; APTALT=apt-get
 else
+	if [ ! -z "$FORCEINSTALL" ]; then
+	APTARG="-y --force-yes"
+	fi
 	APT=apt-get; APTALT=aptitude
 fi
 
@@ -132,7 +141,7 @@ msg "$REINSTALL"
 echo
 
 # Disable PPA from sources.list files
-for LIST in for LIST in $(find /etc/apt/ -name "*.list" -exec readlink '{}' \;); do
+for LIST in $(find /etc/apt/ -name "*.list" -exec readlink -f '{}' \;); do
 	if [ -e $LIST ] && grep -q $PPAOWNER/$PPANAME $LIST; then
 		msg "Disabling $PPAOWNER PPA from $LIST"
 		sed -ri "\:^[^#]+/${PPAOWNER}/${PPANAME}/:s/^deb/# deb/" $LIST
@@ -147,9 +156,9 @@ $APT update > /dev/null || warn "$APT update failed for some reason"
 # APTALT actually works but it would be preferred to remove the package
 # from $REINSTALL directly.
 
-if $APT install $REINSTALL; then
+if $APT $APTARG install $REINSTALL; then
 	msg "PPA purged successfully"
-elif $APTALT install $REINSTALL; then
+elif $APTALT $APTARG install $REINSTALL; then
 	msg "PPA purged successfully using $APTALT fallback"
 else
 	warn "Something went wrong, packages may not have been reverted"
