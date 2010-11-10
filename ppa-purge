@@ -55,7 +55,7 @@ usage() {
 }
 
 # Command line options
-while getopts "p:s:d:ih\?" opt; do
+while getopts "p:s:d:yih\?" opt; do
 	case "$opt" in
 		p ) PPANAME="$OPTARG"				;;
 		s ) PPAHOST="$OPTARG"				;;

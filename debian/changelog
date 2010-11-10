@@ -1,3 +1,9 @@
+ppa-purge (0.2.8+bzr56) natty; urgency=low
+
+  * Really implement the "-y" option.
+
+ -- Lorenzo De Liso <blackz@ubuntu.com>  Wed, 10 Nov 2010 21:12:13 +0100
+
 ppa-purge (0.2.8+bzr55) natty; urgency=low
 
   [ chocolateboy ]
