@@ -127,8 +127,10 @@ if grep -q "ppa-purge" $PPA_PKGS; then
 	msg "Note: Not removing ppa-purge package"
 fi
 
-dpkg --get-selections | awk '/install$/{print $1}' |
-     sort | comm -12 - $PPA_PKGS > $REVERTS
+# Get multi-arch package names for revert list
+cat $PPA_PKGS | sort -u |  
+    xargs dpkg-query -W -f='${binary:Package}\t${db:Status-Abbrev}\n' 2>/dev/null |
+    awk '/ii/{print $1}' > $REVERTS
 
 # Create apt argument list for reverting packages
 REINSTALL=""
