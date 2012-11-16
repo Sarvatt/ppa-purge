@@ -130,7 +130,7 @@ fi
 # Get multi-arch package names for revert list
 cat $PPA_PKGS | sort -u |  
     xargs dpkg-query -W -f='${binary:Package}\t${db:Status-Abbrev}\n' 2>/dev/null |
-    awk '/ii/{print $1}' > $REVERTS
+    awk '/\tii $/{print $1}' > $REVERTS
 
 # Create apt argument list for reverting packages
 REINSTALL=""
