@@ -131,6 +131,12 @@ fi
 cat $PPA_PKGS | sort -u |  
     xargs dpkg-query -W -f='${binary:Package}\t${db:Status-Abbrev}\n' 2>/dev/null |
     awk '/\tii $/{print $1}' > $REVERTS
+# Fallback for Precise
+if [ ! -s $REVERTS ]; then
+    cat $PPA_PKGS | sort -u |  
+        xargs dpkg-query -W -f='${PackageSpec}\t${Status}\n' 2>/dev/null |
+        awk '/\tinstall /{print $1}' > $REVERTS
+fi
 
 # Create apt argument list for reverting packages
 REINSTALL=""
