@@ -8,7 +8,7 @@ Homepage: https://launchpad.net/ppa-purge
 
 Package: ppa-purge
 Architecture: all
-Depends: ${misc:Depends}, aptitude, dpkg (>= 1.16.1)
+Depends: ${misc:Depends}, aptitude (>= 0.6.6-1ubuntu1.2), dpkg (>= 1.16.1)
 Description: disables a PPA and reverts to official packages
  This program disables a PPA from your Software Sources and reverts your
  system back to the official Ubuntu packages. You can use this to return your 
