@@ -6,6 +6,7 @@
 
 # Defaults
 ARCH=$(dpkg --print-architecture)
+F_ARCHS=$(dpkg --print-foreign-architectures)
 PPA_PKGS=$(mktemp)
 REVERTS=$(mktemp)
 trap "rm $PPA_PKGS $REVERTS" 0
@@ -134,15 +135,13 @@ cat $PPA_PKGS | sort -u |
 # Fallback for Precise
 if [ ! -s $REVERTS ]; then
     for PACKAGE in $(cat $PPA_PKGS | sort -u); do
-        echo "$PACKAGE:i386"
         dpkg-query -W -f='${PackageSpec}\t${Status}\n' $PACKAGE 2>/dev/null |
-            awk '/\tinstall/{print $1}' >> $REVERTS 
-        dpkg-query -W -f='${PackageSpec}\t${Status}\n' "$PACKAGE:i386" 2>/dev/null |
-            awk '/\tinstall/{print $1}' >> $REVERTS 
+            awk '/\tinstall/{print $1}' >> $REVERTS
+        for F_ARCH in $F_ARCHS; do 
+            dpkg-query -W -f='${PackageSpec}\t${Status}\n' "$PACKAGE:$F_ARCH" 2>/dev/null |
+                awk '/\tinstall/{print $1}' >> $REVERTS
+        done 
 	done
-#    cat $PPA_PKGS | sort -u |  
-#        xargs dpkg-query -W -f='${PackageSpec}\t${Status}\n' 2>/dev/null |
-#        awk '/\tinstall/{print $1}' > $REVERTS
 fi
 
 # Create apt argument list for reverting packages
