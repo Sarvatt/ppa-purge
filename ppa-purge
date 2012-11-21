@@ -5,7 +5,6 @@
 # AUTHORS: Robert Hooker (Sarvatt), Tormod Volden
 
 # Defaults
-ARCH=$(dpkg --print-architecture)
 F_ARCHS=$(dpkg --print-foreign-architectures)
 PPA_PKGS=$(mktemp)
 REVERTS=$(mktemp)
