@@ -104,7 +104,10 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 msg "Updating packages lists"
-$APT update > /dev/null || warn "$APT update failed for some reason"
+if [ ! $($APT update > /dev/null) ]; then 
+    warn "$APT update failed for some reason"
+    exit 1
+fi
 
 msg "PPA to be removed: $PPAOWNER $PPANAME"
 
