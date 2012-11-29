@@ -1,3 +1,9 @@
+ppa-purge (0.2.8+bzr57ubuntu1) raring; urgency=low
+
+  * Specify removal of packages that don't exist in Ubuntu (LP: #706774) 
+
+ -- Tim Lunn <tim@feathertop.org>  Fri, 30 Nov 2012 08:25:57 +1100
+
 ppa-purge (0.2.8+bzr57) raring; urgency=low
 
   * Generate a multiarch aware package revert list (LP: 892886) 
