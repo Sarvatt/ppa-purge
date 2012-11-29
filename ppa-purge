@@ -104,7 +104,7 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 msg "Updating packages lists"
-if [ ! $($APT update > /dev/null) ]; then 
+if ! $APT update > /dev/null; then 
     warn "$APT update failed for some reason"
     exit 1
 fi
