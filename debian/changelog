@@ -1,8 +1,11 @@
 ppa-purge (0.2.8+bzr57) raring; urgency=low
 
-  * Generate a multiarch aware package revert list (LP: 892886) 
+  [ Tim Lunn ]
+  * Generate a multiarch aware package revert list (LP: #892886)
+  [ Lorenzo De Liso ]
+  * Bumped Standard-Versions to 3.9.3, no additional changes required 
 
- -- Tim Lunn <tim@feathertop.org>  Fri, 16 Nov 2012 10:43:20 +1100
+ -- Lorenzo De Liso <blackz@ubuntu.com>  Fri, 30 Nov 2012 10:29:01 +0100
 
 ppa-purge (0.2.8+bzr56) natty; urgency=low
 
