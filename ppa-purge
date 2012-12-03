@@ -149,7 +149,7 @@ fi
 # Create apt argument list for reverting packages
 REINSTALL=""
 for PACKAGE in $(cat $REVERTS); do
-    AVAIL=$(apt-cache policy $PACKAGE | grep -v $PPAHOST | grep -c "500.*$DIST"  )
+    AVAIL=$(apt-cache policy $PACKAGE | grep -v "$PPAHOST/$PPAOWNER/$PPANAME" | grep -c "500.*$DIST"  )
     if [ $AVAIL -eq 0 ]; then
         REINSTALL="$REINSTALL $PACKAGE-"
     else
