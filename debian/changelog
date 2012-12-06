@@ -1,4 +1,4 @@
-ppa-purge (0.2.8+bzr57ubuntu1) UNRELEASED; urgency=low
+ppa-purge (0.2.8+bzr58) raring; urgency=low
 
   * Add bash autocompletion and tweak options slightly. (LP: #1064205)
  -- Tim Lunn <tim@feathertop.org>  Thu, 06 Dec 2012 14:12:52 +1100
