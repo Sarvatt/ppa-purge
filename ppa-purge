@@ -31,7 +31,7 @@ usage() {
 	echo
 	echo "Options:"
 	echo "	-p [ppaname]		PPA name to be disabled (default: ppa)"
-	echo "  -o [ppaowner]   PPA owner"
+	echo "	-o [ppaowner]		PPA owner"
 	echo "	-s [host]		Repository server (default: ppa.launchpad.net)"
 	echo "	-d [distribution]	Override the default distribution choice."
 	echo "	-y 			Pass "-y --force-yes" to apt-get or "-y" to aptitude"
