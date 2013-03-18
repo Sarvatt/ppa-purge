@@ -3,6 +3,8 @@ Section: utils
 Priority: optional
 Maintainer: Lorenzo De Liso <blackz@ubuntu.com>
 Build-Depends: debhelper (>= 7.0.50~)
+Vcs-Bzr: https://code.launchpad.net/~ppa-purge/ppa-purge/ubuntu
+Vcs-Browser: https://bazaar.launchpad.net/~ppa-purge/ppa-purge/ubuntu
 Standards-Version: 3.9.3
 Homepage: https://launchpad.net/ppa-purge
 
