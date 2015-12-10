@@ -31,6 +31,7 @@ usage() {
 	echo
 	echo "Options:"
 	echo "	-p [ppaname]		PPA name to be disabled (default: ppa)"
+	echo "	-o [ppaowner]		PPA owner"
 	echo "	-s [host]		Repository server (default: ppa.launchpad.net)"
 	echo "	-d [distribution]	Override the default distribution choice."
 	echo "	-y 			Pass "-y --force-yes" to apt-get or "-y" to aptitude"
@@ -38,13 +39,13 @@ usage() {
 	echo "	-h			Display this help text"
 	echo
 	echo "Example usage commands:"
-	echo "	sudo ppa-purge xorg-edgers"
+	echo "	sudo ppa-purge -o xorg-edgers"
 	echo "	will remove https://launchpad.net/~xorg-edgers/+archive/ppa"
 	echo
-	echo "	sudo ppa-purge -p xorg-testing sarvatt"
+	echo "	sudo ppa-purge -o sarvatt -p xorg-testing"
 	echo "	will remove https://launchpad.net/~sarvatt/+archive/xorg-testing"
 	echo
-	echo "	sudo ppa-purge ppa:ubuntu-x-swat/x-updates"
+	echo "	sudo ppa-purge [ppa:]ubuntu-x-swat/x-updates"
 	echo "	will remove https://launchpad.net/~ubuntu-x-swat/+archive/x-updates"
 	echo
 	echo "Notice: If ppa-purge fails for some reason and you wish to try again,"
@@ -54,22 +55,27 @@ usage() {
 	exit $1
 }
 
+
 # Command line options
-while getopts "p:s:d:yih\?" opt; do
+while getopts "p:o:s:d:yih\?" opt; do
 	case "$opt" in
 		p ) PPANAME="$OPTARG"				;;
-		s ) PPAHOST="$OPTARG"				;;
-		d ) DIST="$OPTARG"				;;
+		o ) PPAOWNER="$OPTARG"				;;
+		s ) PPAHOST="$OPTARG"   			;;
+		d ) DIST="$OPTARG"					;;
 		y ) FORCEINSTALL="true"				;;
-		i ) APTALT="true" 				;;
-		h ) usage 0;					;;
-		\?) usage 1;					;;
+		i ) APTALT="true"					;;
+		h ) usage 0;						;;
+		\?) usage 1;						;;
 		* ) warn "Unknown option '$opt'"; usage 1;	;;
 	esac
 done
 shift $(($OPTIND -1))
 
-PPAOWNER=$1
+if [ -z "$PPAOWNER" ]; then
+    PPAOWNER=$1
+fi
+
 APTARG=""
 if [ ! -z "$APTALT" ]; then
 	if [ ! -z "$FORCEINSTALL" ]; then
@@ -86,6 +92,11 @@ fi
 if echo $1 | grep -q "^ppa:"; then
 	PPAOWNER=$(echo $1 | sed "s#^ppa:\(.*\)/\(.*$\)#\1#")
 	PPANAME=$(echo $1 | sed "s#^ppa:\(.*\)/\(.*$\)#\2#")
+else 
+    if echo $1 | grep -q "^.*/.*$"; then
+        PPAOWNER=$(echo $1 | sed "s#^\(.*\)/\(.*$\)#\1#")
+    	PPANAME=$(echo $1 | sed "s#^\(.*\)/\(.*$\)#\2#")
+    fi
 fi
 
 if [ -z "$PPAOWNER" ]; then
