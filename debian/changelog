@@ -1,11 +1,10 @@
-ppa-purge (0.2.8+bzr58) raring; urgency=low
+ppa-purge (0.2.8+bzr63) xenial; urgency=low
 
   * Add bash autocompletion and tweak options slightly. (LP: #1064205)
- -- Tim Lunn <tim@feathertop.org>  Thu, 06 Dec 2012 14:12:52 +1100
-
-ppa-purge (0.2.8+bzr57) raring; urgency=low
-
   * Specify removal of packages that don't exist in Ubuntu (LP: #706774) 
+  * Add some logic to handle packages that have had a soname bump, packages with
+    manual renames will still break, however these should be pretty rare. (LP: #1392954)
+  * Add Vcs-fields, Thanks Dominique Lasserre
 
  -- Tim Lunn <tim@feathertop.org>  Fri, 30 Nov 2012 08:25:57 +1100
 
