@@ -104,7 +104,10 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 msg "Updating packages lists"
-$APT update > /dev/null || warn "$APT update failed for some reason"
+if ! $APT update > /dev/null; then 
+    warn "$APT update failed for some reason"
+    exit 1
+fi
 
 msg "PPA to be removed: $PPAOWNER $PPANAME"
 
@@ -146,7 +149,12 @@ fi
 # Create apt argument list for reverting packages
 REINSTALL=""
 for PACKAGE in $(cat $REVERTS); do
-	REINSTALL="$REINSTALL $PACKAGE/$DIST"
+    AVAIL=$(apt-cache policy $PACKAGE | grep -v "$PPAHOST/$PPAOWNER/$PPANAME" | grep -c "500.*$DIST"  )
+    if [ $AVAIL -eq 0 ]; then
+        REINSTALL="$REINSTALL $PACKAGE-"
+    else
+        REINSTALL="$REINSTALL $PACKAGE/$DIST"
+    fi
 done
 
 msg "Package revert list generated:"
@@ -165,9 +173,7 @@ msg "Updating packages lists"
 $APT update > /dev/null || warn "$APT update failed for some reason"
 
 # FIXME:
-# Workaround for now in case APT fails because of a package not in Ubuntu.
-# APTALT actually works but it would be preferred to remove the package
-# from $REINSTALL directly.
+# Workaround for now in case APT fails because of missing dependencies.
 
 if $APT $APTARG install $REINSTALL; then
 	msg "PPA purged successfully"
